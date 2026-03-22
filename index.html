@@ -119,6 +119,25 @@
     margin-top: 0.1rem;
   }
 
+  .test-link {
+    display: inline-block;
+    margin-top: 1.5rem;
+    padding: 0.7rem 2rem;
+    background: linear-gradient(135deg, var(--gold), var(--coral));
+    color: #0e0f1a;
+    font-weight: 700;
+    font-size: 0.92rem;
+    text-decoration: none;
+    border-radius: 99px;
+    transition: transform 0.2s, box-shadow 0.2s;
+    box-shadow: 0 4px 20px rgba(255,212,59,0.2);
+    animation: fadeDown 0.5s ease-out 0.32s both;
+  }
+  .test-link:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 28px rgba(255,212,59,0.35);
+  }
+
   /* ── Grid ── */
   .grid-wrapper {
     max-width: 800px;
@@ -298,6 +317,7 @@
       <div class="stat-label">회차</div>
     </div>
   </div>
+  <a href="review-test.html" class="test-link">📝 리뷰 테스트 바로가기 →</a>
 </div>
 
 <div class="grid-wrapper">
