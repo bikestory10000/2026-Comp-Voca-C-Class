@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>민쌤영어 압축보카 2.0</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;600;800&family=Anybody:wght@700;900&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg-deep: #0e0f1a;
+    --bg-card: #161826;
+    --bg-card-hover: #1c1f33;
+    --border: #252840;
+    --cyan: #00d2ff;
+    --gold: #ffd43b;
+    --coral: #ff6b6b;
+    --text: #d4d4de;
+    --text-dim: #6b6e85;
+    --text-bright: #f0f0f5;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg-deep);
+    color: var(--text);
+    font-family: 'Noto Sans KR', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* ── Grain overlay ── */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  /* ── Hero ── */
+  .hero {
+    text-align: center;
+    padding: 4.5rem 1.5rem 3rem;
+    position: relative;
+  }
+
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+  }
+
+  .hero .badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    color: var(--cyan);
+    border: 1px solid rgba(0,210,255,0.25);
+    padding: 0.3rem 1rem;
+    border-radius: 99px;
+    margin-bottom: 1.25rem;
+    animation: fadeDown 0.5s ease-out;
+  }
+
+  .hero h1 {
+    font-family: 'Anybody', 'Noto Sans KR', sans-serif;
+    font-weight: 900;
+    font-size: clamp(2.2rem, 6vw, 3.4rem);
+    color: var(--text-bright);
+    line-height: 1.15;
+    letter-spacing: -0.02em;
+    animation: fadeDown 0.5s ease-out 0.08s both;
+  }
+
+  .hero h1 span {
+    background: linear-gradient(135deg, var(--gold), var(--coral));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  .hero .desc {
+    margin-top: 1rem;
+    font-size: 0.92rem;
+    color: var(--text-dim);
+    font-weight: 300;
+    animation: fadeDown 0.5s ease-out 0.16s both;
+  }
+
+  .hero .stats {
+    display: flex;
+    justify-content: center;
+    gap: 2.5rem;
+    margin-top: 1.5rem;
+    animation: fadeDown 0.5s ease-out 0.24s both;
+  }
+
+  .hero .stat-num {
+    font-family: 'Anybody', sans-serif;
+    font-weight: 700;
+    font-size: 1.6rem;
+    color: var(--text-bright);
+  }
+
+  .hero .stat-label {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-top: 0.1rem;
+  }
+
+  /* ── Grid ── */
+  .grid-wrapper {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 2.5rem 1.25rem 4rem;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+
+  /* ── Card row ── */
+  .card-link {
+    display: grid;
+    grid-template-columns: 72px 1fr auto;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 1.15rem 1.5rem;
+    background: transparent;
+    border-bottom: 1px solid var(--border);
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.2s, padding-left 0.2s;
+    animation: fadeUp 0.45s ease-out both;
+  }
+
+  .card-link:first-child { border-top: 1px solid var(--border); }
+
+  .card-link:hover {
+    background: var(--bg-card-hover);
+    padding-left: 1.75rem;
+  }
+
+  /* 회차 number badge */
+  .round {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 62px;
+    height: 40px;
+    border-radius: 8px;
+    font-family: 'Anybody', sans-serif;
+    font-weight: 700;
+    font-size: 0.95rem;
+    letter-spacing: -0.02em;
+    flex-shrink: 0;
+  }
+
+  /* Color-code by range */
+  .round.tier-high   { background: rgba(0,210,255,0.1); color: var(--cyan); }
+  .round.tier-mid    { background: rgba(255,212,59,0.1); color: var(--gold); }
+  .round.tier-low    { background: rgba(255,107,107,0.1); color: var(--coral); }
+
+  .card-info {
+    min-width: 0;
+  }
+
+  .card-title {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text-bright);
+    margin-bottom: 0.15rem;
+  }
+
+  .card-sub {
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    font-weight: 300;
+  }
+
+  .card-meta {
+    text-align: right;
+    flex-shrink: 0;
+  }
+
+  .word-count {
+    font-family: 'Anybody', sans-serif;
+    font-weight: 700;
+    font-size: 1.05rem;
+    color: var(--text);
+  }
+
+  .word-label {
+    font-size: 0.65rem;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* arrow indicator */
+  .card-link::after {
+    content: '→';
+    font-size: 1rem;
+    color: var(--border);
+    transition: color 0.2s, transform 0.2s;
+    margin-left: 0.5rem;
+  }
+
+  .card-link:hover::after {
+    color: var(--cyan);
+    transform: translateX(3px);
+  }
+
+  /* restyle grid to include the arrow */
+  .card-link {
+    grid-template-columns: 62px 1fr auto auto;
+  }
+
+  /* ── Footer ── */
+  .footer {
+    text-align: center;
+    padding: 1.5rem;
+    font-size: 0.68rem;
+    color: var(--text-dim);
+    letter-spacing: 0.04em;
+  }
+
+  /* ── Animations ── */
+  @keyframes fadeDown {
+    from { opacity: 0; transform: translateY(-14px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* stagger cards */
+  .card-link:nth-child(1)  { animation-delay: 0.1s; }
+  .card-link:nth-child(2)  { animation-delay: 0.14s; }
+  .card-link:nth-child(3)  { animation-delay: 0.18s; }
+  .card-link:nth-child(4)  { animation-delay: 0.22s; }
+  .card-link:nth-child(5)  { animation-delay: 0.26s; }
+  .card-link:nth-child(6)  { animation-delay: 0.30s; }
+  .card-link:nth-child(7)  { animation-delay: 0.34s; }
+  .card-link:nth-child(8)  { animation-delay: 0.38s; }
+  .card-link:nth-child(9)  { animation-delay: 0.42s; }
+  .card-link:nth-child(10) { animation-delay: 0.46s; }
+  .card-link:nth-child(11) { animation-delay: 0.50s; }
+  .card-link:nth-child(12) { animation-delay: 0.54s; }
+  .card-link:nth-child(13) { animation-delay: 0.58s; }
+  .card-link:nth-child(14) { animation-delay: 0.62s; }
+  .card-link:nth-child(15) { animation-delay: 0.66s; }
+  .card-link:nth-child(16) { animation-delay: 0.70s; }
+  .card-link:nth-child(17) { animation-delay: 0.74s; }
+  .card-link:nth-child(18) { animation-delay: 0.78s; }
+
+  /* ── Mobile ── */
+  @media (max-width: 560px) {
+    .hero { padding: 3rem 1rem 2.5rem; }
+    .hero .stats { gap: 1.5rem; }
+    .card-link { grid-template-columns: 50px 1fr auto auto; gap: 0.75rem; padding: 1rem; }
+    .round { width: 50px; height: 34px; font-size: 0.82rem; }
+    .card-title { font-size: 0.88rem; }
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="badge">편입영어 · 빈출 논리 어휘</div>
+  <h1>민쌤영어<br><span>압축보카 2.0</span></h1>
+  <div class="desc">빈출 회차별 핵심 어휘 · 예문 · 다의어 정리</div>
+  <div class="stats">
+    <div>
+      <div class="stat-num">18</div>
+      <div class="stat-label">파일</div>
+    </div>
+    <div>
+      <div class="stat-num">471</div>
+      <div class="stat-label">표제어</div>
+    </div>
+    <div>
+      <div class="stat-num">62–99</div>
+      <div class="stat-label">회차</div>
+    </div>
+  </div>
+</div>
+
+<div class="grid-wrapper">
+  <div class="grid">
+
+    <a class="card-link" href="2026-Comp-Voca-99.html">
+      <div class="round tier-high">99</div>
+      <div class="card-info">
+        <div class="card-title">99회</div>
+        <div class="card-sub">빈출 논리 어휘 완벽 정리</div>
+      </div>
+      <div class="card-meta">
+        <div class="word-count">16</div>
+        <div class="word-label">words</div>
+      </div>
+    </a>
+
+    <a class="card-link" href="2026-Comp-Voca-9897.html">
+      <div class="round tier-high">98–97</div>
+      <div class="card-info">
+        <div class="card-title">98~97회</div>
+        <div class="card-sub">빈출 논리 어휘 완벽 정리</div>
+      </div>
+      <div class="card-meta">
+        <div class="word-count">24</div>
+        <div class="word-label">words</div>
+      </div>
+    </a>
+
+    <a class="card-link" href="2026-Comp-Voca-9694.html">
+      <div class="round tier-high">96–94</div>
+      <div class="card-info">
+        <div class="card-title">96~94회</div>
+        <div class="card-sub">빈출 논리 어휘 완벽 정리</div>
+      </div>
+      <div class="card-meta">
+        <div class="word-count">20</div>
+        <div class="word-label">words</div>
+      </div>
+    </a>
+
+    <a class="card-link" href="2026-Comp-Voca-9391.html">
+      <div class="round tier-high">93–91</div>
+      <div class="card-info">
+        <div class="card-title">93~91회</div>
+        <div class="card-sub">빈출 논리 어휘 완벽 정리</div>
+      </div>
+      <div class="card-meta">
+        <div class="word-count">25</div>
+        <div class="word-label">words</div>
+      </div>
+    </a>
+
+    <a class="card-link" href="2026-Comp-Voca-9089.html">
+      <div class="round tier-high">90–89</div>
+      <div class="card-info">
+        <div class="card-title">90~89회</div>
+        <div class="card-sub">빈출 논리 어휘 완벽 정리</div>
+      </div>
+      <div class="card-meta">
+        <div class="word-count">21</div>
+        <div class="word-label">words</div>
+      </div>
+    </a>
+
+    <a class="card-link" href="2026-Comp-Voca-8887.html">
+      <div class="round tier-high">88–87</div>
+      <div class="card-info">
+        <div class="card-title">88~87회</div>
+        <div class="card-sub">빈출 논리 어휘 완벽 정리</div>
+      </div>
+      <div class="card-meta">
+        <div class="word-count">27</div>
+        <div class="word-label">words</div>
+      </div>
+    </a>
+
+    <a class="card-link" href="2026-Comp-Voca-8685.html">
+      <div class="round tier-mid">86–85</div>
+      <div class="card-info">
+        <div class="card-title">86~85회</div>
+        <div class="card-sub">빈출 논리 어휘 완벽 정리</div>
+      </div>
+      <div class="card-meta">
+        <div class="word-count">22</div>
+        <div class="word-label">words</div>
+      </div>
+    </a>
+
+    <a class="card-link" href="2026-Comp-Voca-8483.html">
+      <div class="round tier-mid">84–83</div>
+      <div class="card-info">
+        <div class="card-title">84~83회</div>
+        <div class="card-sub">빈출 논리 어휘 완벽 정리</div>
+      </div>
+      <div class="card-meta">
+        <div class="word-count">18</div>
+        <div class="word-label">words</div>
+      </div>
+    </a>
+
+    <a class="card-link" href="2026-Comp-Voca-8281.html">
+      <div class="round tier-mid">82–81</div>
+      <div class="card-info">
+        <div class="card-title">82~81회</div>
+        <div class="card-sub">빈출 논리 어휘 완벽 정리</div>
+      </div>
+      <div class="card-meta">
+        <div class="word-count">20</div>
+        <div class="word-label">words</div>
+      </div>
+    </a>
+
+    <a class="card-link" href="2026-Comp-Voca-8078.html">
+      <div class="round tier-mid">80–78</div>
+      <div class="card-info">
+        <div class="card-title">80~78회</div>
+        <div class="card-sub">빈출 논리 어휘 완벽 정리</div>
+      </div>
+      <div class="card-meta">
+        <div class="word-count">21</div>
+        <div class="word-label">words</div>
+      </div>
+    </a>
+
+    <a class="card-link" href="2026-Comp-Voca-7775.html">
+      <div class="round tier-mid">77–75</div>
+      <div class="card-info">
+        <div class="card-title">77~75회</div>
+        <div class="card-sub">빈출 논리 어휘 완벽 정리</div>
+      </div>
+      <div class="card-meta">
+        <div class="word-count">27</div>
+        <div class="word-label">words</div>
+      </div>
+    </a>
+
+    <a class="card-link" href="2026-Comp-Voca-7473.html">
+      <div class="round tier-mid">74–73</div>
+      <div class="card-info">
+        <div class="card-title">74~73회</div>
+        <div class="card-sub">빈출 논리 어휘 완벽 정리</div>
+      </div>
+      <div class="card-meta">
+        <div class="word-count">23</div>
+        <div class="word-label">words</div>
+      </div>
+    </a>
+
+    <a class="card-link" href="2026-Comp-Voca-7271.html">
+      <div class="round tier-low">72–71</div>
+      <div class="card-info">
+        <div class="card-title">72~71회</div>
+        <div class="card-sub">빈출 논리 어휘 완벽 정리</div>
+      </div>
+      <div class="card-meta">
+        <div class="word-count">25</div>
+        <div class="word-label">words</div>
+      </div>
+    </a>
+
+    <a class="card-link" href="2026-Comp-Voca-7069.html">
+      <div class="round tier-low">70–69</div>
+      <div class="card-info">
+        <div class="card-title">70~69회</div>
+        <div class="card-sub">빈출 논리 어휘 완벽 정리</div>
+      </div>
+      <div class="card-meta">
+        <div class="word-count">29</div>
+        <div class="word-label">words</div>
+      </div>
+    </a>
+
+    <a class="card-link" href="2026-Comp-Voca-6867.html">
+      <div class="round tier-low">68–67</div>
+      <div class="card-info">
+        <div class="card-title">68~67회</div>
+        <div class="card-sub">빈출 논리 어휘 완벽 정리</div>
+      </div>
+      <div class="card-meta">
+        <div class="word-count">28</div>
+        <div class="word-label">words</div>
+      </div>
+    </a>
+
+    <a class="card-link" href="2026-Comp-Voca-6665.html">
+      <div class="round tier-low">66–65</div>
+      <div class="card-info">
+        <div class="card-title">66~65회</div>
+        <div class="card-sub">빈출 논리 어휘 완벽 정리</div>
+      </div>
+      <div class="card-meta">
+        <div class="word-count">34</div>
+        <div class="word-label">words</div>
+      </div>
+    </a>
+
+    <a class="card-link" href="2026-Comp-Voca-6463.html">
+      <div class="round tier-low">64–63</div>
+      <div class="card-info">
+        <div class="card-title">64~63회</div>
+        <div class="card-sub">빈출 논리 어휘 완벽 정리</div>
+      </div>
+      <div class="card-meta">
+        <div class="word-count">36</div>
+        <div class="word-label">words</div>
+      </div>
+    </a>
+
+    <a class="card-link" href="2026-Comp-Voca-6260.html">
+      <div class="round tier-low">62–60</div>
+      <div class="card-info">
+        <div class="card-title">62~60회</div>
+        <div class="card-sub">빈출 논리 어휘 완벽 정리</div>
+      </div>
+      <div class="card-meta">
+        <div class="word-count">55</div>
+        <div class="word-label">words</div>
+      </div>
+    </a>
+
+  </div>
+</div>
+
+<div class="footer">© 민쌤영어 · 압축보카 2.0 · 편입 어휘 시리즈</div>
+
+</body>
+</html>
