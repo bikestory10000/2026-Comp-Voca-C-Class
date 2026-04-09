@@ -36,7 +36,7 @@
     content: '';
     position: fixed; inset: 0;
     background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.04'/%3E%3C/svg%3E");
-    pointer-events: none; z-index: 999;
+    pointer-events: none; z-index: 0;
   }
 
   /* ── Header ── */
@@ -143,22 +143,25 @@
 
   /* ── Card ── */
   .card-container {
-    perspective: 1200px; margin-bottom: 1.5rem;
+    perspective: 1200px; -webkit-perspective: 1200px; margin-bottom: 1.5rem;
   }
   .card {
     position: relative; width: 100%; min-height: 280px;
     transition: transform 0.6s cubic-bezier(0.4, 0, 0.2, 1);
     transform-style: preserve-3d;
+    -webkit-transform-style: preserve-3d;
   }
-  .card.flipped { transform: rotateY(180deg); }
+  .card.flipped { transform: rotateY(180deg); -webkit-transform: rotateY(180deg); }
   .card-front, .card-back {
-    position: absolute; width: 100%; min-height: 280px;
-    backface-visibility: hidden; border-radius: var(--card-radius);
+    width: 100%; min-height: 280px;
+    backface-visibility: hidden; -webkit-backface-visibility: hidden;
+    border-radius: var(--card-radius);
     border: 1px solid var(--border); padding: 28px 24px;
   }
-  .card-front { background: var(--bg-card); }
+  .card-front { background: var(--bg-card); position: relative; }
   .card-back {
-    background: var(--bg-card-alt); transform: rotateY(180deg);
+    background: var(--bg-card-alt); transform: rotateY(180deg); -webkit-transform: rotateY(180deg);
+    position: absolute; top: 0; left: 0;
   }
 
   .q-number {
@@ -185,6 +188,8 @@
     font-size: 0.92rem; color: var(--text); cursor: pointer;
     font-family: inherit; transition: all 0.2s; display: flex;
     align-items: center; gap: 8px;
+    -webkit-tap-highlight-color: rgba(0,210,255,0.15);
+    touch-action: manipulation;
   }
   .choice-btn:hover:not(:disabled) { border-color: var(--cyan); background: rgba(0,210,255,0.05); }
   .choice-btn .num {
@@ -246,7 +251,9 @@
     background: var(--bg-card); border: 1px solid var(--border);
     color: var(--text-bright); font-size: 0.95rem; font-weight: 600;
     font-family: inherit; cursor: pointer; transition: all 0.2s;
-    margin-top: 12px;
+    margin-top: 12px; position: relative; z-index: 10;
+    -webkit-tap-highlight-color: rgba(0,210,255,0.2);
+    touch-action: manipulation;
   }
   .next-btn:hover { border-color: var(--cyan); background: rgba(0,210,255,0.05); }
 
@@ -535,10 +542,8 @@ function showQuestion() {
   document.getElementById('card').classList.remove('flipped');
   document.getElementById('nextBtn').style.display = 'none';
 
-  // Force reflow for min-height
-  const front = document.getElementById('cardFront');
-  const card = document.getElementById('card');
-  card.style.minHeight = front.scrollHeight + 'px';
+  // Reset card height (card-front is position:relative, so card auto-sizes)
+  document.getElementById('card').style.minHeight = '';
 }
 
 function selectAnswer(btn, isCorrect, item, options) {
@@ -598,18 +603,26 @@ function selectAnswer(btn, isCorrect, item, options) {
   // Flip card
   setTimeout(() => {
     const card = document.getElementById('card');
+    const front = document.getElementById('cardFront');
     card.classList.add('flipped');
-    // Adjust height for back
-    setTimeout(() => {
-      card.style.minHeight = back.scrollHeight + 'px';
-    }, 100);
+    // Set min-height to max of front and back so card doesn't collapse during flip
+    requestAnimationFrame(() => {
+      const backH = back.scrollHeight;
+      const frontH = front.scrollHeight;
+      card.style.minHeight = Math.max(backH, frontH) + 'px';
+    });
   }, 400);
 
   // Show next button
   setTimeout(() => {
-    document.getElementById('nextBtn').style.display = 'block';
-    document.getElementById('nextBtn').textContent = 
+    const nextBtn = document.getElementById('nextBtn');
+    nextBtn.style.display = 'block';
+    nextBtn.textContent = 
       (currentIndex + 1 >= quizItems.length) ? '결과 보기 →' : '다음 문제 →';
+    // Scroll to make next button visible on mobile
+    setTimeout(() => {
+      nextBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    }, 100);
   }, 600);
 }
 
